@@ -1,0 +1,69 @@
+query SearchExercicesQuery{
+  searchExercises(
+      exercise: {
+        name: "бугага"
+      }
+) {
+    success
+    errors
+  	exercises {
+        _id
+        name
+    }
+  }
+}
+
+
+mutation CreateOrUpdateExercicesMutation{
+  createExercise(
+		exercise: {
+      name: "Подтягивание номер 6"
+      description: "много текста"
+      count: 10
+    }
+
+
+) {
+    success
+    errors
+  	exercise {
+			_id
+      name
+    }
+
+  }
+}
+
+
+
+mutation DeleteExercisesMutation{
+  deleteExercises(
+		exercise: {
+      name: "Подтягивание номер 6"
+    }
+) {
+    success
+    errors
+  	exercises {
+        _id
+        name
+    }
+
+  }
+}
+
+query AllExercicesQuery{
+  searchExercises(
+      exercise: {
+      }
+) {
+    success
+    errors
+  	exercises {
+        _id
+        name
+    }
+  }
+}
+
+

@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: fitness
+    ports:
+      - 27017:27017
+    volumes:
+      - .:/data/db
+
+  myapplication:
+    image: myapp:1.0
+    environment:
+      DB_HOST: mongo
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: fitness
+      DB_PORT: 27017
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongo
+    build: .
+    stdin_open: true
+    tty: true
