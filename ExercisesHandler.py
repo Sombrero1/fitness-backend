@@ -5,8 +5,10 @@ from Exercise import Exercise
 
 
 @convert_kwargs_to_snake_case
-def createExercise(obj, info, exercise):
+def createExercise(obj, info, exercise, context_value=None):
     try:
+        user = info.context
+        exercise.update(dict(user=user.id))
         record = Exercise.objects(name=exercise['name'])
         if record:
             record.update(**exercise)
@@ -28,6 +30,8 @@ def createExercise(obj, info, exercise):
 @convert_kwargs_to_snake_case
 def searchExercises(obj, info, exercise):
     try:
+        user = info.context
+        exercise.update(dict(user=user.id))
         payload = {
             "success": True,
             "exercises": list(Exercise.objects(**exercise).as_pymongo())
@@ -41,8 +45,10 @@ def searchExercises(obj, info, exercise):
 
 
 @convert_kwargs_to_snake_case
-def deleteExercises(obj, info, exercise):
+def deleteExercises(obj, info, exercise, user):
     try:
+        user = info.context
+        exercise.update(dict(user=user.id))
         records = Exercise.objects(**exercise)
         payload = {
             "success": True,

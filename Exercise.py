@@ -1,4 +1,10 @@
-from mongoengine import Document, StringField, IntField
+from mongoengine import Document, StringField, IntField, ReferenceField
+
+
+class User(Document):
+    login = StringField(required=True, unique=True)
+    password = StringField(required=True, max_length=500)
+
 
 class Exercise(Document):
     name = StringField(required=True, max_length=30, unique=True)
@@ -7,4 +13,4 @@ class Exercise(Document):
     measure = StringField()
     count = IntField(min_value=0)
     picture = StringField() #base64
-    # user = IntField(required=True, max_length=30)
+    user = ReferenceField(User)

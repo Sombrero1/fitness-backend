@@ -11,12 +11,11 @@ from ariadne.constants import PLAYGROUND_HTML
 
 from mongoengine import connect
 
+from Exercise import User
 from ExercisesHandler import searchExercises, createExercise, deleteExercises
+from authenticate import get_token, token_required
 
-client = connect(db="fitness", host=os.environ['DB_HOST'], port=27017)
-
-
-
+client = connect(db="fitness", host=os.environ.get('DB_HOST', 'localhost'), port=27017)
 
 app = FastAPI()
 
@@ -32,22 +31,57 @@ schema = make_executable_schema(
     type_defs, query, mutation, snake_case_fallback_resolvers
 )
 
-
 @app.get("/graphql")
 async def graphql_interface():
     return Response(PLAYGROUND_HTML)
 
 @app.post("/graphql")
-async def graphql_server(request: Request):
+@token_required
+async def graphql_server(request: Request, user):
     data = await request.json()
     success, result = graphql_sync(
         schema,
         data,
-        context_value=request,
-        debug=app.debug
+        context_value=user,
+        debug=app.debug,
     )
     status_code = 200 if success else 400
     return JSONResponse(jsonable_encoder(result), status_code=status_code)
+
+
+from pydantic import BaseModel, Field, StrictStr
+
+
+class AuthSchema(BaseModel):
+    login: str
+    password: str
+
+@app.post("/auth")
+async def auth(request: Request, auth: AuthSchema):
+    data = await request.json()
+    record = User.objects(login=auth.login)
+    if record.first().password != auth.password:
+        payload = {
+            "success": False,
+            "errors": [str("Wrong password")]
+        }
+        return JSONResponse(jsonable_encoder(payload), status_code=401)
+    result = {'token': get_token(data)}
+    return JSONResponse(jsonable_encoder(result), status_code=200)
+
+
+@app.post("/register")
+async def register(auth: AuthSchema):
+    record = User.objects(login=auth.login)
+    if record:
+        payload = {
+            "success": False,
+            "errors": [str("Yet exists")]
+        }
+        return JSONResponse(jsonable_encoder(payload), status_code=401)
+
+    User(**auth.dict()).save()
+    return JSONResponse(jsonable_encoder(dict(success=True)), status_code=200)
 
 
 if __name__ == "__main__":
