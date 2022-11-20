@@ -7,7 +7,7 @@ schema {
 type Exercise {
     _id: String
     name: String
-    class: String
+    class_exercise: String
     description: String
     measure: String
     count: Int
@@ -17,7 +17,7 @@ type Exercise {
 input ExerciseInput {
     _id: ID
     name: String
-    class: String
+    class_exercise: String
     description: String
     measure: String
     count: Int
@@ -27,7 +27,7 @@ input ExerciseInput {
 input ExerciseReqNameInput {
     id: ID
     name: String!
-    class: String
+    class_exercise: String
     description: String
     measure: String
     count: Int
