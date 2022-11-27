@@ -1,34 +1,14 @@
-query SearchExercicesQuery{
-  searchExercises(
-      exercise: {
-        name: "бугага"
-      }
-) {
-    success
-    errors
-  	exercises {
-        _id
-        name
-    }
-  }
-}
-
-
-mutation CreateOrUpdateExercicesMutation{
+mutation CreateOrUpdateExercicesMutation($exercise: ExerciseInput!){
   createExercise(
-		exercise: {
-      name: "Подтягивание номер 6"
-      description: "много текста"
-      count: 10
-    }
-
-
+		exercise: $exercise
 ) {
     success
     errors
-  	exercise {
-			_id
-      name
+  	exercises {
+        id # for update
+        name
+        class_exercise
+        picture
     }
 
   }
@@ -36,34 +16,80 @@ mutation CreateOrUpdateExercicesMutation{
 
 
 
-mutation DeleteExercisesMutation{
+mutation DeleteExercisesMutation($exercise: ExerciseInput!){
   deleteExercises(
-		exercise: {
-      name: "Подтягивание номер 6"
-    }
+		exercise: $exercise
 ) {
     success
     errors
   	exercises {
-        _id
-        name
+        id
     }
 
   }
 }
 
-query AllExercicesQuery{
+query AllExercicesQuery($exercise: ExerciseInput){
   searchExercises(
-      exercise: {
-      }
+      exercise: $exercise
 ) {
     success
     errors
   	exercises {
-        _id
+        id
         name
+        class_exercise
+        count
+        picture
     }
   }
 }
 
 
+
+mutation DeleteTrainingsMutation($training: TrainingInput!){
+  deleteTrainings(
+		training: $training
+) {
+    success
+    errors
+  	trainings {
+        id
+    }
+  }
+}
+
+query searchTrainings($training: TrainingInput!){
+    searchTrainings(
+        training: $training
+  ) {
+      success
+      errors
+      trainings{
+        name
+        training_lines{
+          exercise
+          count
+        }
+      }
+  }
+}
+
+mutation createTrainings($training: TrainingInput!){
+    createTrainings(
+     training: $training
+  ) {
+      success
+      errors
+      trainings {
+        id
+        name
+        training_lines{
+            id
+            exercise
+            count
+        }
+
+      }
+  }
+}

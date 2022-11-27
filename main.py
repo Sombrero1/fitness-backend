@@ -12,19 +12,25 @@ from ariadne.constants import PLAYGROUND_HTML
 from mongoengine import connect
 
 from Exercise import User
-from ExercisesHandler import searchExercises, createExercise, deleteExercises
+from ExercisesHandler import searchExercises, createExercise, deleteExercises, deleteTrainings, createTraining, \
+    searchTrainings
 from authenticate import get_token, token_required
 
 client = connect(db="fitness", host=os.environ.get('DB_HOST', 'localhost'), port=27017)
 
 app = FastAPI()
 
-query = ObjectType("QueryExercises")
-mutation = ObjectType("MutationExercises")
+query = ObjectType("QueryFitness")
+mutation = ObjectType("MutationFitness")
 
 query.set_field("searchExercises", searchExercises)
 mutation.set_field("createExercise", createExercise)
 mutation.set_field("deleteExercises", deleteExercises)
+
+query.set_field("searchTrainings", searchTrainings)
+mutation.set_field("deleteTrainings", deleteTrainings)
+mutation.set_field("createTrainings", createTraining)
+
 
 type_defs = load_schema_from_path("schema.graphqls")
 schema = make_executable_schema(
