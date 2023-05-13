@@ -9,8 +9,8 @@ mutation CreateOrUpdateExercicesMutation($exercise: ExerciseInput!){
         name
         class_exercise
         picture
+        published
     }
-
   }
 }
 
@@ -31,7 +31,7 @@ mutation DeleteExercisesMutation($exercise: ExerciseInput!){
 
 query AllExercicesQuery($exercise: ExerciseInput){
   searchExercises(
-      exercise: $exercise
+      exercise: $exercise, page, size
 ) {
     success
     errors
@@ -42,6 +42,8 @@ query AllExercicesQuery($exercise: ExerciseInput){
         count
         picture
     }
+    position
+    total_count
   }
 }
 
@@ -66,6 +68,7 @@ query searchTrainings($training: TrainingInput!){
       success
       errors
       trainings{
+        id
         name
         training_lines{
           exercise
@@ -90,6 +93,19 @@ mutation createTrainings($training: TrainingInput!){
             count
         }
 
+      }
+  }
+}
+
+
+query searchUsers($user: UserInput!){
+    searchUsers(
+        user: $user
+  ) {
+      success
+      errors
+      users{
+        nickname
       }
   }
 }

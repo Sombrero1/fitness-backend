@@ -12,6 +12,8 @@ type Exercise {
     measure: String
     count: Int
     picture: String
+    published: Boolean
+    user: User
 }
 
 input ExerciseInput {
@@ -22,6 +24,8 @@ input ExerciseInput {
     measure: String
     count: Int
     picture: String
+    global: Boolean
+    published: Boolean
 }
 
 input TrainingLineInput {
@@ -34,6 +38,7 @@ input TrainingInput {
     name: String
     training_lines: [TrainingLineInput]
 }
+
 
 type TrainingLine {
     id: String
@@ -53,18 +58,47 @@ type ExercisesResult {
     success: Boolean
     errors: [String]
     exercises: [Exercise]
+    position: Int
+    total_count: Int
 }
 
 type TrainingResult {
     success: Boolean
     errors: [String]
     trainings: [Training]
+
+}
+
+type User {
+    nickname: String
+    picture: String
+}
+
+input UserOrderByInput {
+  nickname: Sort
+}
+
+enum Sort {
+  asc
+  desc
+}
+
+input UserInput {
+    nickname: String
+    order_by: UserOrderByInput
+}
+
+type UserResult {
+    success: Boolean
+    errors: [String]
+    users: [User]
 }
 
 
 type QueryFitness {
-    searchExercises(exercise: ExerciseInput): ExercisesResult!
+    searchExercises(exercise: ExerciseInput, page: Int, size: Int): ExercisesResult!
     searchTrainings(training: TrainingInput): TrainingResult!
+    searchUsers(user: UserInput): UserResult!
 }
 
 type MutationFitness {

@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
@@ -13,7 +14,7 @@ from mongoengine import connect
 
 from Exercise import User
 from ExercisesHandler import searchExercises, createExercise, deleteExercises, deleteTrainings, createTraining, \
-    searchTrainings
+    searchTrainings, searchUsers
 from authenticate import get_token, token_required
 
 client = connect(db="fitness", host=os.environ.get('DB_HOST', 'localhost'), port=27017)
@@ -31,6 +32,8 @@ query.set_field("searchTrainings", searchTrainings)
 mutation.set_field("deleteTrainings", deleteTrainings)
 mutation.set_field("createTrainings", createTraining)
 
+query.set_field("searchUsers", searchUsers)
+
 
 type_defs = load_schema_from_path("schema.graphqls")
 schema = make_executable_schema(
@@ -43,7 +46,7 @@ async def graphql_interface():
 
 @app.post("/graphql")
 @token_required
-async def graphql_server(request: Request, user):
+async def graphql_server(request: Request, user=None):
     data = await request.json()
     success, result = graphql_sync(
         schema,
@@ -61,6 +64,8 @@ from pydantic import BaseModel, Field, StrictStr
 class AuthSchema(BaseModel):
     login: str
     password: str
+    nickname: Optional[str]
+    picture: Optional[str]
 
 @app.post("/auth")
 async def auth(request: Request, auth: AuthSchema):
@@ -74,6 +79,13 @@ async def auth(request: Request, auth: AuthSchema):
         return JSONResponse(jsonable_encoder(payload), status_code=401)
     result = {'token': get_token(data)}
     return JSONResponse(jsonable_encoder(result), status_code=200)
+
+@app.post("/update_profile")
+@token_required
+async def update_profile(request: Request, user: AuthSchema):
+    data = await request.json()
+    user.update(**data)
+    return JSONResponse(jsonable_encoder(dict(success=True)), status_code=200)
 
 
 @app.post("/register")

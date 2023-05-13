@@ -1,11 +1,13 @@
-from mongoengine import Document, StringField, IntField, ReferenceField, CASCADE, ListField, NULLIFY, ObjectIdField
+from mongoengine import Document, StringField, IntField, ReferenceField, CASCADE, ListField, NULLIFY, ObjectIdField, BooleanField
 
 
 
 class User(Document):
     login = StringField(required=True, unique=True)
     password = StringField(required=True, max_length=500)
-
+    nickname = StringField(required=True, unique=True)
+    picture = StringField()  # base64
+    # user = ReferenceField(User)
 
 class Exercise(Document):
     name = StringField(required=True, max_length=30, unique=False)
@@ -14,10 +16,13 @@ class Exercise(Document):
     measure = StringField()
     picture = StringField() #base64
     user = ReferenceField(User)
+    published = BooleanField(default=False)
+    count = IntField() # drop
 
 class TrainingExercise(Document):
     exercise = ReferenceField(Exercise, reverse_delete_rule=CASCADE)
     # training = ReferenceField(Training, reverse_delete_rule=CASCADE)
+    measure = StringField()
     count = IntField(min_value=0)
 
 class Training(Document):
