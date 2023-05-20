@@ -20,6 +20,7 @@ from authenticate import get_token, token_required
 client = connect(db="fitness", host=os.environ.get('DB_HOST', 'localhost'), port=27017)
 
 app = FastAPI()
+# scp -r  /Users/sombrero1/PycharmProjects/fitness-backend sombrero1@84.201.187.3:/home/sombrero1/fintess_backend_2.0
 
 query = ObjectType("QueryFitness")
 mutation = ObjectType("MutationFitness")
@@ -71,13 +72,22 @@ class AuthSchema(BaseModel):
 async def auth(request: Request, auth: AuthSchema):
     data = await request.json()
     record = User.objects(login=auth.login)
+    if not record.first():
+        payload = {
+            "success": False,
+            "errors": [str("Not found user")]
+        }
+        return JSONResponse(jsonable_encoder(payload), status_code=401)
     if record.first().password != auth.password:
         payload = {
             "success": False,
             "errors": [str("Wrong password")]
         }
         return JSONResponse(jsonable_encoder(payload), status_code=401)
-    result = {'token': get_token(data)}
+    result = {
+        'token': get_token(data),
+        'picture': record.first().picture
+    }
     return JSONResponse(jsonable_encoder(result), status_code=200)
 
 @app.post("/update_profile")

@@ -26,6 +26,7 @@ input ExerciseInput {
     picture: String
     global: Boolean
     published: Boolean
+    user: UserInput
 }
 
 input TrainingLineInput {
@@ -36,6 +37,7 @@ input TrainingLineInput {
 input TrainingInput {
     id: String
     name: String
+    text: String
     training_lines: [TrainingLineInput]
 }
 
@@ -46,11 +48,33 @@ type TrainingLine {
     count: Int
 }
 
+type TrainingLineWithExercise {
+    id: String
+    exercise: Exercise
+    count: Int
+}
+
+type TrainingLike {
+    user: User
+}
+
 
 type Training {
     id: String
     name: String
+    text: String
+    user: User
     training_lines: [TrainingLine]
+    likes: [User]
+}
+
+type TrainingWithExercise {
+    id: String
+    name: String
+    text: String
+    user: User
+    training_lines: [TrainingLineWithExercise]
+    likes: [User]
 }
 
 
@@ -66,7 +90,12 @@ type TrainingResult {
     success: Boolean
     errors: [String]
     trainings: [Training]
+}
 
+type TrainingResultWithExercise {
+    success: Boolean
+    errors: [String]
+    trainings: [TrainingWithExercise]
 }
 
 type User {
@@ -85,6 +114,8 @@ enum Sort {
 
 input UserInput {
     nickname: String
+    password: String
+    login: String
     order_by: UserOrderByInput
 }
 
@@ -97,7 +128,7 @@ type UserResult {
 
 type QueryFitness {
     searchExercises(exercise: ExerciseInput, page: Int, size: Int): ExercisesResult!
-    searchTrainings(training: TrainingInput): TrainingResult!
+    searchTrainings(training: TrainingInput): TrainingResultWithExercise!
     searchUsers(user: UserInput): UserResult!
 }
 

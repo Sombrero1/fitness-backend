@@ -23,6 +23,7 @@ def to_dict(objs):
                 i.to_mongo()
                 if '_id' in i:
                     i["id"] = i['_id']
+
                 dicts.append(i)
 
     return dicts
@@ -71,6 +72,11 @@ def searchExercises(obj, info, exercise, page=1, size=10):
             exercise.update({
                 'class_exercise__iexact': class_exercise
             })
+        user = exercise.pop('user', None)
+        if user:
+            user = User.objects(nickname=user['nickname']).first()
+            if user:
+                exercise.update(user=user.id)
         # exercise.update({
         #     'slice': [offset, size]
         # })
@@ -78,7 +84,7 @@ def searchExercises(obj, info, exercise, page=1, size=10):
         payload = {
             "success": True,
             "exercises": to_dict(exercises),
-            "position":  max(Exercise.objects(**exercise).count() - limit, 0),
+            "position":  max(Exercise.objects(**exercise).count() - limit, Exercise.objects(**exercise).count()),
             "total_count": Exercise.objects(**exercise).count(),
         }
     except Exception as error:
@@ -113,16 +119,41 @@ def deleteExercises(obj, info, exercise):
 def searchTrainings(obj, info, training):
     try:
         user = info.context
-        training.update(dict(user=user.id))
+        #training.update(dict(user=user.id))
+        #
+        # a, b = to_dict(Training.objects(**training).exclude("training_lines").select_related()), to_dict(
+        #     Training.objects(**training).exclude("user"))
+        # a_new = []
+        # for i in b:
+        #     t = {}
+        #     for j in i.keys():
+        #         t[j] =
+        # def merge_dicts(a, b):
+        #     result = {}
+        #     for d in dicts:
+        #         id = d["id"]
+        #         if id in result:
+        #             result[id].update(d)
+        #         else:
+        #             result[id] = d.copy()
+        #     return result
+        # merge_dicts(a_new + b)
+        # a = to_dict(Training.objects(**training).select_related(max_depth=1))
+        a = to_dict(Training.objects(**training).select_related())
+        # for i in a:
+        #     for j in i['training_lines']:
+        #         j['exercise'] = j['exercise']['id']
+
         payload = {
             "success": True,
-            "trainings": to_dict(Training.objects(**training))
+            "trainings": a
         }
     except Exception as error:
         payload = {
             "success": False,
             "errors": [str(error)]
         }
+        raise
     return payload
 
 @convert_kwargs_to_snake_case

@@ -1,5 +1,5 @@
-from mongoengine import Document, StringField, IntField, ReferenceField, CASCADE, ListField, NULLIFY, ObjectIdField, BooleanField
-
+from mongoengine import Document, StringField, IntField, ReferenceField, CASCADE, ListField, NULLIFY, ObjectIdField, \
+    BooleanField, GenericReferenceField, LazyReferenceField, EmbeddedDocument, EmbeddedDocumentField, GenericEmbeddedDocumentField
 
 
 class User(Document):
@@ -19,13 +19,19 @@ class Exercise(Document):
     published = BooleanField(default=False)
     count = IntField() # drop
 
-class TrainingExercise(Document):
-    exercise = ReferenceField(Exercise, reverse_delete_rule=CASCADE)
+class TrainingExercise(EmbeddedDocument):
+    exercise = ReferenceField(Exercise)
     # training = ReferenceField(Training, reverse_delete_rule=CASCADE)
     measure = StringField()
     count = IntField(min_value=0)
 
 class Training(Document):
     name = StringField(required=True, max_length=30, unique=False)
-    training_lines = ListField(ReferenceField(TrainingExercise))
+    text = StringField(required=True, unique=False)
     user = ReferenceField(User)
+    training_lines = ListField(EmbeddedDocumentField(TrainingExercise))
+
+
+# class TrainingLike(Document):
+#     user = ReferenceField(User)
+#     training = ReferenceField(Training)

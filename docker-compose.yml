@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
 
-  mongo:
+  mongo2:
     image: mongo
     restart: always
     environment:
@@ -12,12 +12,12 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - .:/data/db
+      - .:/data/db2
 
   myapplication:
     image: myapp:1.0
     environment:
-      DB_HOST: mongo
+      DB_HOST: mongo2
       DB_USER: root
       DB_PASSWORD: example
       DB_NAME: fitness
@@ -25,7 +25,7 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - mongo
+      - mongo2
     build: .
     stdin_open: true
     tty: true
